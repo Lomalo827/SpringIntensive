@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class TaskService {
 
-    private Map<Long, Task> task = new HashMap<Long,Task>(
+    private Map<Long, Task> taskBucket = new HashMap<Long,Task>(
             Map.of(1L, new Task(
                     1L,
                     1L,
@@ -41,15 +41,30 @@ public class TaskService {
             )
     );
 
-    public Task getTaskById(Long id){
+    public Task getTaskById(Long taskId){
 
-        if (!task.containsKey(id)){
+        if (!taskBucket.containsKey(taskId)){
             throw new NoSuchElementException();
         }
-        return task.get(id);
+        return taskBucket.get(taskId);
     }
 
     public List<Task> getAllTasks(){
-        return task.values().stream().toList();
+        return taskBucket.values().stream().toList();
     }
+
+//    public Task saveTask(Task task){
+//        taskBucket.put(task.getId(),new Task(
+//                task.getId(),
+//                task.getCreatorId(),
+//                task.getStatus(),
+//                task.getCreateDateTime(),
+//                task.getDeadlineDate(),
+//                task.getPriority()
+//        ));
+//
+//        return task;
+//
+//    }
+
 }

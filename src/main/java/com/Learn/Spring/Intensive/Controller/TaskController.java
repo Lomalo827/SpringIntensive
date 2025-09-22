@@ -7,13 +7,12 @@ import com.Learn.Spring.Intensive.Service.TaskService;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("task")
 public class TaskController {
 
     private final TaskService taskService;
@@ -24,10 +23,10 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Long id){
+    @GetMapping("/{taskId}")
+    public Task getTaskById(@PathVariable Long taskId){
         log.info("getTaskById");
-        return taskService.getTaskById(id);
+        return taskService.getTaskById(taskId);
     }
 
     @GetMapping
@@ -35,5 +34,11 @@ public class TaskController {
         log.info("getAllTasks");
         return taskService.getAllTasks();
     }
+
+//    @PostMapping("/save_task")
+//    public Task saveTask(@RequestBody Task task){
+//        log.info("Called saveTask");
+//        return taskService.saveTask(task);
+//    }
 
 }
