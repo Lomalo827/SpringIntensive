@@ -20,7 +20,8 @@ public class Task {
         this.priority = priority;
     }
 
-    public Long getId() {
+
+    public Long getTaskId() {
         return taskId;
     }
 
