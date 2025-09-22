@@ -4,15 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Task {
-    private Long id;
+    private Long taskId;
     private Long creatorId;
     private Status status;
     private LocalDateTime createDateTime;
     private LocalDate deadlineDate;
     private Priority priority;
 
-    public Task(Long id, Long creatorId, Status status, LocalDateTime createDateTime, LocalDate deadlineDate, Priority priority) {
-        this.id = id;
+    public Task(Long taskId, Long creatorId, Status status, LocalDateTime createDateTime, LocalDate deadlineDate, Priority priority) {
+        this.taskId = taskId;
         this.creatorId = creatorId;
         this.status = status;
         this.createDateTime = createDateTime;
@@ -21,7 +21,7 @@ public class Task {
     }
 
     public Long getId() {
-        return id;
+        return taskId;
     }
 
     public Long getCreatorId() {
