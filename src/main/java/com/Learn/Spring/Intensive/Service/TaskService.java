@@ -3,7 +3,9 @@ package com.Learn.Spring.Intensive.Service;
 
 import com.Learn.Spring.Intensive.Entity.Status;
 import com.Learn.Spring.Intensive.Entity.Task;
-import org.springframework.http.ResponseEntity;
+import com.Learn.Spring.Intensive.Entity.TaskEntity;
+import com.Learn.Spring.Intensive.Repository.TaskRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -12,64 +14,78 @@ import java.util.*;
 @Service
 public class TaskService {
 
-    private HashMap<Long,Task> taskBucket = new HashMap<>();
-    private static Long taskCounter=0L;
+    private final TaskRepository taskRepository;
 
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     public Task getTaskById(Long taskId){
 
-        if (!taskBucket.containsKey(taskId)){
-            throw new NoSuchElementException("No task with such taskId");
-        }
-        return taskBucket.get(taskId);
+        TaskEntity taskEntity = taskRepository.findById(taskId)
+                .orElseThrow(()->new EntityNotFoundException("No task with such taskId "+taskId));
+
+        return toDomain(taskEntity);
     }
 
     public List<Task> getAllTasks(){
-        return taskBucket.values().stream().toList();
+
+        List<TaskEntity> taskEntities = taskRepository.findAll();
+        return taskEntities.stream().map(
+                this::toDomain
+        ).toList();
     }
 
     public Task createTask(Task task){
         if(task.getTaskId()!=null || task.getStatus()!=null){
             throw new IllegalArgumentException("Adding taskId or status not allowed");
         }
-        taskBucket.put(taskCounter+=1,new Task(
-                taskCounter,
+        var taskEntity = new TaskEntity(
+                null,
                 task.getCreatorId(),
                 Status.CREATED,
                 task.getCreateDateTime(),
                 task.getDeadlineDate(),
                 task.getPriority()
-        ));
-        return taskBucket.get(taskCounter);
+        );
+        var savedTaskEntity = taskRepository.save(taskEntity);
+        return toDomain(savedTaskEntity);
     }
 
     public Task updateTask(Long taskId, Task taskToUpdate) {
         if(taskToUpdate.getTaskId()!=null || taskToUpdate.getStatus()!=null){
             throw new IllegalArgumentException("Adding taskId or status not allowed");
         }
-        if (!taskBucket.containsKey(taskId)){
-            throw new NoSuchElementException("No task with taskId = "+taskId);
-        }
-        if (taskBucket.get(taskId).getStatus()==Status.DONE){
-            throw new IllegalStateException("Illegal to update task with status = DONE");
-        }
 
-        var updatedTask = new Task(
-                taskBucket.get(taskId).getTaskId(),
+        var selectedTask = taskRepository.findById(taskId)
+                .orElseThrow(()-> new EntityNotFoundException("No task with taskId = "+taskId));
+        var taskToSave = new TaskEntity(
+                selectedTask.getTaskId(),
                 taskToUpdate.getCreatorId(),
-                taskBucket.get(taskId).getStatus(),
+                selectedTask.getStatus(),
                 taskToUpdate.getCreateDateTime(),
                 taskToUpdate.getDeadlineDate(),
                 taskToUpdate.getPriority()
         );
-        taskBucket.put(taskId,updatedTask);
-        return taskBucket.get(taskId);
+        var savedTask = taskRepository.save(taskToSave);
+        return toDomain(savedTask);
     }
 
     public void deleteTask(Long taskId) {
-        if (!taskBucket.containsKey(taskId)){
-            throw new NoSuchElementException("No task with taskId = "+taskId);
-        }
-        taskBucket.remove(taskId);
+
+        var taskToDelete = taskRepository.findById(taskId)
+                .orElseThrow(()-> new EntityNotFoundException("No task with taskId = "+taskId));
+        taskRepository.delete(taskToDelete);
+    }
+
+    private Task toDomain(TaskEntity taskEntities){
+        return new Task(
+                taskEntities.getTaskId(),
+                taskEntities.getCreatorId(),
+                taskEntities.getStatus(),
+                taskEntities.getCreateDateTime(),
+                taskEntities.getDeadlineDate(),
+                taskEntities.getPriority()
+        );
     }
 }
