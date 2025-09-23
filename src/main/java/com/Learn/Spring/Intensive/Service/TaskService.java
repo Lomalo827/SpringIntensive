@@ -80,16 +80,20 @@ public class TaskService {
         taskRepository.delete(taskToDelete);
     }
 
-    public void startTask(Long taskId) {
+    public Task startTask(Long taskId) {
         Long count;
         var selectedTask = taskRepository.findById(taskId).orElseThrow(()->new EntityNotFoundException("No task with taskId = "+taskId));
+        if (selectedTask.getAssignedUserId()==null){
+            throw new IllegalArgumentException("Cannot start task because no assigned user for this taskId "+taskId);
+        }
         count = taskRepository.CountAssignedUsersWithStatusInProgress(selectedTask.getAssignedUserId());
         System.out.println(count);
         if (count>4){
             throw new IllegalStateException("Illegal to start task for user = " + selectedTask.getAssignedUserId()+ " with five active tasks" );
         }
         selectedTask.setStatus(Status.IN_PROGRESS);
-        taskRepository.save(selectedTask);
+        var updatedTask = taskRepository.save(selectedTask);
+        return toDomain(updatedTask);
     }
 
     private Task toDomain(TaskEntity taskEntities){

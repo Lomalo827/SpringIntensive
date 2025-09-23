@@ -42,10 +42,9 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/start")
-    public void startTask(@PathVariable Long taskId){
+    public ResponseEntity<Task> startTask(@PathVariable Long taskId){
         log.info("Called startTask for task with id = {}",taskId);
-        taskService.startTask(taskId);
-//        return ResponseEntity.status(200).body(taskService.startTask(taskId));
+        return ResponseEntity.status(200).body(taskService.startTask(taskId));
     }
 
     @PutMapping("/update_task/{taskId}")
