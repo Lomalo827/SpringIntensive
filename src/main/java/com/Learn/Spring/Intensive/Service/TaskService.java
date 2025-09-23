@@ -43,6 +43,7 @@ public class TaskService {
         var taskEntity = new TaskEntity(
                 null,
                 task.getCreatorId(),
+                task.getAssignedUserId(),
                 Status.CREATED,
                 task.getCreateDateTime(),
                 task.getDeadlineDate(),
@@ -62,6 +63,7 @@ public class TaskService {
         var taskToSave = new TaskEntity(
                 selectedTask.getTaskId(),
                 taskToUpdate.getCreatorId(),
+                taskToUpdate.getAssignedUserId(),
                 selectedTask.getStatus(),
                 taskToUpdate.getCreateDateTime(),
                 taskToUpdate.getDeadlineDate(),
@@ -78,14 +80,32 @@ public class TaskService {
         taskRepository.delete(taskToDelete);
     }
 
+    public Task startTask(Long taskId) {
+        Long count;
+        var selectedTask = taskRepository.findById(taskId).orElseThrow(()->new EntityNotFoundException("No task with taskId = "+taskId));
+        if (selectedTask.getAssignedUserId()==null){
+            throw new IllegalArgumentException("Cannot start task because no assigned user for this taskId "+taskId);
+        }
+        count = taskRepository.CountAssignedUsersWithStatusInProgress(selectedTask.getAssignedUserId());
+        System.out.println(count);
+        if (count>4){
+            throw new IllegalStateException("Illegal to start task for user = " + selectedTask.getAssignedUserId()+ " with five active tasks" );
+        }
+        selectedTask.setStatus(Status.IN_PROGRESS);
+        var updatedTask = taskRepository.save(selectedTask);
+        return toDomain(updatedTask);
+    }
+
     private Task toDomain(TaskEntity taskEntities){
         return new Task(
                 taskEntities.getTaskId(),
                 taskEntities.getCreatorId(),
+                taskEntities.getAssignedUserId(),
                 taskEntities.getStatus(),
                 taskEntities.getCreateDateTime(),
                 taskEntities.getDeadlineDate(),
                 taskEntities.getPriority()
         );
     }
+
 }

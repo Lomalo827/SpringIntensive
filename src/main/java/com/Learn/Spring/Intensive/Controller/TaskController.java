@@ -5,6 +5,7 @@ import com.Learn.Spring.Intensive.Service.TaskService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,12 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task){
         log.info("Called saveTask");
         return ResponseEntity.status(201).body(taskService.createTask(task));
+    }
+
+    @PostMapping("/{taskId}/start")
+    public ResponseEntity<Task> startTask(@PathVariable Long taskId){
+        log.info("Called startTask for task with id = {}",taskId);
+        return ResponseEntity.status(200).body(taskService.startTask(taskId));
     }
 
     @PutMapping("/update_task/{taskId}")

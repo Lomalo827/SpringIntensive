@@ -16,6 +16,9 @@ public class TaskEntity {
     @Column(name = "creator_id")
     private Long creatorId;
 
+    @Column(name="assigned_user_id")
+    private Long assignedUserId;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -33,9 +36,10 @@ public class TaskEntity {
     public TaskEntity() {
     }
 
-    public TaskEntity(Long taskId, Long creatorId, Status status, LocalDateTime createDateTime, LocalDate deadlineDate, Priority priority) {
+    public TaskEntity(Long taskId, Long creatorId, Long assignedUserId, Status status, LocalDateTime createDateTime, LocalDate deadlineDate, Priority priority) {
         this.taskId = taskId;
         this.creatorId = creatorId;
+        this.assignedUserId = assignedUserId;
         this.status = status;
         this.createDateTime = createDateTime;
         this.deadlineDate = deadlineDate;
@@ -52,6 +56,10 @@ public class TaskEntity {
 
     public Long getCreatorId() {
         return creatorId;
+    }
+
+    public Long getAssignedUserId() {
+        return assignedUserId;
     }
 
     public LocalDateTime getCreateDateTime() {
@@ -72,6 +80,10 @@ public class TaskEntity {
 
     public void setCreatorId(Long creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public void setAssignedUserId(Long assignedUserId) {
+        this.assignedUserId = assignedUserId;
     }
 
     public void setStatus(Status status) {
